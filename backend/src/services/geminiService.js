@@ -22,7 +22,9 @@ function getClient() {
  */
 async function predictRisk({ diffText, targetService, blastRadius, incidents }) {
   const client = getClient();
-  const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
+  // Using the "flash-latest" alias so this keeps working as Google
+  // rotates model versions - as of this writing it points to Gemini 3.5 Flash.
+  const model = client.getGenerativeModel({ model: "gemini-flash-latest" });
 
   const incidentSummary = incidents
     .map(
