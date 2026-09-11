@@ -13,6 +13,40 @@ function getClient() {
   return genAI;
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Retries a Gemini call on transient errors (503 overload, 429 rate limit)
+ * with exponential backoff. Doesn't retry on permanent errors (bad API key,
+ * 404 model not found, invalid request) since those won't succeed no matter
+ * how many times we try.
+ */
+async function callWithRetry(fn, { maxAttempts = 3, baseDelayMs = 1000 } = {}) {
+  let lastErr;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      const message = err.message || "";
+      const isTransient = /503|overloaded|rate limit|429|UNAVAILABLE/i.test(
+        message
+      );
+      if (!isTransient || attempt === maxAttempts) {
+        throw err;
+      }
+      const delay = baseDelayMs * 2 ** (attempt - 1);
+      console.warn(
+        `Gemini call attempt ${attempt} failed (transient), retrying in ${delay}ms: ${message}`
+      );
+      await sleep(delay);
+    }
+  }
+  throw lastErr;
+}
+
 /**
  * Asks Gemini to reason over the diff + blast radius + incident history
  * and produce a structured risk assessment per affected downstream service.
@@ -71,7 +105,7 @@ Respond with ONLY valid JSON, no markdown fences, no commentary, in this exact s
   ]
 }`;
 
-  const result = await model.generateContent(prompt);
+  const result = await callWithRetry(() => model.generateContent(prompt));
   const text = result.response.text();
 
   const cleaned = text.replace(/```json|```/g, "").trim();
