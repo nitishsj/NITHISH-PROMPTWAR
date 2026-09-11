@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Blast Radius Predictor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">◆</span>
+    <span class="brand-name">Blast Radius Predictor</span>
+  </div>
+  <div class="brand-sub">know what breaks before you ship</div>
+</header>
+
+<main class="layout">
+
+  <section class="graph-panel">
+    <h2 class="panel-title">Dependency graph</h2>
+    <div id="graph-container">
+      <svg id="graph-svg" viewBox="0 0 700 460" role="img" aria-label="Service dependency graph"></svg>
+    </div>
+    <div class="legend">
+      <span class="legend-item"><i class="dot dot-idle"></i>no change</span>
+      <span class="legend-item"><i class="dot dot-low"></i>low risk</span>
+      <span class="legend-item"><i class="dot dot-medium"></i>medium risk</span>
+      <span class="legend-item"><i class="dot dot-high"></i>high risk</span>
+      <span class="legend-item"><i class="dot dot-critical"></i>critical risk</span>
+    </div>
+  </section>
+
+  <section class="input-panel">
+    <h2 class="panel-title">Paste a PR diff</h2>
+
+    <div class="sample-buttons">
+      <button class="sample-btn" data-sample="risky">Load risky sample</button>
+      <button class="sample-btn" data-sample="safe">Load safe sample</button>
+    </div>
+
+    <textarea id="diff-input" placeholder="Paste a diff here. Mention the service name (e.g. payment-service) somewhere in the path or code so the predictor can identify it."></textarea>
+
+    <button id="analyze-btn" class="analyze-btn">Predict blast radius</button>
+
+    <div id="status-line" class="status-line"></div>
+
+    <div id="results" class="results"></div>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

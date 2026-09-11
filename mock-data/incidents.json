@@ -1,0 +1,36 @@
+{
+  "incidents": [
+    {
+      "id": "INC-101",
+      "date": "2026-03-14",
+      "title": "Payment schema change broke order creation",
+      "root_cause": "payment-service changed the response shape of /payment/charge (removed 'transactionId' field, replaced with 'txnRef'). order-service was reading 'transactionId' directly and started throwing null errors on every checkout.",
+      "affected_services": ["payment-service", "order-service"],
+      "severity": "critical"
+    },
+    {
+      "id": "INC-098",
+      "date": "2026-01-22",
+      "title": "Auth token expiry change locked out payment flow",
+      "root_cause": "auth-service shortened JWT expiry from 24h to 1h without notifying downstream teams. payment-service's long-running subscription job used cached tokens and started failing auth checks mid-transaction.",
+      "affected_services": ["auth-service", "payment-service"],
+      "severity": "high"
+    },
+    {
+      "id": "INC-087",
+      "date": "2025-11-05",
+      "title": "Inventory reservation race condition during flash sale",
+      "root_cause": "inventory-service's /inventory/reserve endpoint was modified to skip a lock check for performance, causing double-booking of stock when order-service issued concurrent requests.",
+      "affected_services": ["inventory-service", "order-service"],
+      "severity": "medium"
+    },
+    {
+      "id": "INC-073",
+      "date": "2025-09-18",
+      "title": "Notification queue backup delayed order confirmations",
+      "root_cause": "notification-service database migration locked the notification_log table for 10 minutes, causing order-service's confirmation step to time out and orders to appear stuck.",
+      "affected_services": ["notification-service", "order-service"],
+      "severity": "medium"
+    }
+  ]
+}

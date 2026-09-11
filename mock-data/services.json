@@ -1,0 +1,39 @@
+{
+  "services": [
+    {
+      "name": "auth-service",
+      "description": "Handles user login, JWT issuance, session validation",
+      "endpoints": ["/auth/login", "/auth/verify", "/auth/refresh"],
+      "database_tables": ["users", "sessions"],
+      "depends_on": []
+    },
+    {
+      "name": "payment-service",
+      "description": "Processes payments, subscriptions, refunds",
+      "endpoints": ["/payment/charge", "/payment/refund", "/payment/subscribe"],
+      "database_tables": ["transactions", "subscriptions"],
+      "depends_on": ["auth-service", "notification-service"]
+    },
+    {
+      "name": "inventory-service",
+      "description": "Tracks product stock levels and reservations",
+      "endpoints": ["/inventory/check", "/inventory/reserve", "/inventory/release"],
+      "database_tables": ["stock", "reservations"],
+      "depends_on": ["auth-service"]
+    },
+    {
+      "name": "order-service",
+      "description": "Creates and manages customer orders",
+      "endpoints": ["/order/create", "/order/status", "/order/cancel"],
+      "database_tables": ["orders"],
+      "depends_on": ["payment-service", "inventory-service", "notification-service"]
+    },
+    {
+      "name": "notification-service",
+      "description": "Sends email/SMS/push notifications",
+      "endpoints": ["/notify/email", "/notify/sms", "/notify/push"],
+      "database_tables": ["notification_log"],
+      "depends_on": []
+    }
+  ]
+}
