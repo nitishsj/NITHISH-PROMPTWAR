@@ -150,13 +150,24 @@ function setStatus(msg, isError) {
   el.className = "status-line" + (isError ? " error" : "");
 }
 
+function fallbackNote(data) {
+  const reason = data.fallback_reason || "";
+  if (/GEMINI_API_KEY is not set/i.test(reason)) {
+    return " (no Gemini API key configured — add one for live reasoning)";
+  }
+  if (/503|overloaded|UNAVAILABLE|429|rate limit/i.test(reason)) {
+    return " (Gemini is temporarily overloaded — showing offline reasoning, try again shortly)";
+  }
+  return " (Gemini call failed — showing offline reasoning)";
+}
+
 function renderResults(data) {
   const container = document.getElementById("results");
   container.innerHTML = "";
 
   const banner = document.createElement("div");
   banner.className = "overall-banner";
-  banner.innerHTML = `<strong>${data.changed_service}</strong> → overall risk: <strong style="color:${riskColor(data.overall_risk)}">${data.overall_risk}</strong>${data.source === "mock-fallback" ? " (offline fallback mode — add a Gemini API key for live reasoning)" : ""}`;
+  banner.innerHTML = `<strong>${data.changed_service}</strong> → overall risk: <strong style="color:${riskColor(data.overall_risk)}">${data.overall_risk}</strong>${data.source === "mock-fallback" ? fallbackNote(data) : ""}`;
   container.appendChild(banner);
 
   data.predictions.forEach((p) => {

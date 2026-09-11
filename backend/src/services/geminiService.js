@@ -56,9 +56,10 @@ async function callWithRetry(fn, { maxAttempts = 3, baseDelayMs = 1000 } = {}) {
  */
 async function predictRisk({ diffText, targetService, blastRadius, incidents }) {
   const client = getClient();
-  // Using the "flash-latest" alias so this keeps working as Google
-  // rotates model versions - as of this writing it points to Gemini 3.5 Flash.
-  const model = client.getGenerativeModel({ model: "gemini-flash-latest" });
+  // Using "flash-lite-latest" - lighter weight than flash-latest, so less
+  // likely to hit capacity-driven 503s during high-demand periods, while
+  // still handling this structured-reasoning task well.
+  const model = client.getGenerativeModel({ model: "gemini-flash-lite-latest" });
 
   const incidentSummary = incidents
     .map(
